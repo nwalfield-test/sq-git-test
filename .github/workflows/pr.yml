@@ -1,0 +1,7 @@
+name: on-pr
+on: pull_request
+jobs:
+  hi:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo pull request
