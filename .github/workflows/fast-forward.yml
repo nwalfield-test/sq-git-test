@@ -32,6 +32,7 @@ jobs:
               git log -n 1 $GITHUB_SHA
               exit 1
           fi
+          echo Posting comment.
           curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
