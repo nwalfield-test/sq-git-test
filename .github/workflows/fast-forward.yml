@@ -32,14 +32,24 @@ jobs:
           echo $GITHUB_SHA:
           git log -n 1 $GITHUB_SHA
 
+          echo
+          PR_HEAD=$(git rev-parse HEAD)
+          echo $PR_HEAD:
+          git log -n 1 $PR_HEAD
+
+          # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issue_comment
+          #
+          # - GITHUB_SHA: Last commit on default branch.
+          # - GITHUB_REF: Default branch.
+          git switch -c pr-$PR_HEAD $PR_HEAD
           git merge --ff-only $GITHUB_SHA
           git push origin
 
           echo Posting comment.
-          curl --silent --show-error -L \
+          curl --silent --show-error -- location \
             -X POST \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             ${{ github.event.issue.url }}/comments \
             -d '{"body":"Fast-forward job"}'
