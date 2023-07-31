@@ -7,22 +7,3 @@ jobs:
       pull-requests: write
     steps:
       - run: echo pull request
-
-name: fast-forward
-on:
-  issue_comment:
-    types: [created, edited]
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/fast-forward') }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        fetch-depth: 0
-
-      - name: Fast Forwarding
-        run: |
-          echo "Fast forwarding"
-          git push origin $GITHUB_SHA:$(git branch --show-current)
-
