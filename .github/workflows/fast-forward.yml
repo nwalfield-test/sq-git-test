@@ -14,6 +14,25 @@ jobs:
 
       - name: Fast Forwarding
         run: |
-          echo "Fast forwarding"
-          git push origin $GITHUB_SHA:$(git branch --show-current)
+          echo Triggered by issue #${{ github.event.issue.number }}
+          if git merge-base --is-ancestor $GITHUB_SHA HEAD
+          then
+              echo "Fast forwarding"
+              git merge --ff-only $GITHUB_SHA
+              git push origin
+          else
+              echo "Cannot fast forward HEAD to $GITHUB_SHA"
+              git log -n 1 HEAD
+              git log -n 1 $GITHUB_SHA
+              exit 1
+          fi
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            ${{ github.event.issue.url }}/comments \
+            -d '{"body":"Fast-forward job"}'
+
+
 
