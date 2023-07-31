@@ -22,19 +22,19 @@ jobs:
       - name: Fast Forwarding
         run: |
           echo Repository is ${{ github.repository }}
-          echo Triggered by issue #${{ github.event.issue.number }}
+          echo Triggered by issue ${{ github.event.issue.number }}
           echo Triggered from ${{ github.event.issue.url }}
-          if git merge-base --is-ancestor HEAD $GITHUB_SHA
-          then
-              echo "Fast forwarding"
-              git merge --ff-only $GITHUB_SHA
-              git push origin
-          else
-              echo "Cannot fast forward HEAD to $GITHUB_SHA"
-              git log -n 1 HEAD
-              git log -n 1 $GITHUB_SHA
-              exit 1
-          fi
+
+          echo "Trying to fast forward HEAD to $GITHUB_SHA"
+          echo HEAD:
+          git log -n 1 HEAD
+          echo
+          echo $GITHUB_SHA:
+          git log -n 1 $GITHUB_SHA
+
+          git merge --ff-only $GITHUB_SHA
+          git push origin
+
           echo Posting comment.
           curl --silent --show-error -L \
             -X POST \
