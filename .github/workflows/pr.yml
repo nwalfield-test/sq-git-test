@@ -18,6 +18,7 @@ jobs:
       - name: Checking for fast forwarding
         run: |
           echo github.event's value:; cat $GITHUB_ENV
+
           LOG=$(mktemp)
           {
             # echo Repository is ${{ github.repository }}
