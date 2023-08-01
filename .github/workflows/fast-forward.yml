@@ -26,6 +26,10 @@ jobs:
           # JSON-encoded data in the file $GITHUB_EVENT_PATH.
           #
           # echo "github.event's value:"; cat $GITHUB_ENV
+          #
+          # For an issue_comment event:
+          #
+          # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
           LOG=$(mktemp)
           {
             # echo Repository is ${{ github.repository }}
