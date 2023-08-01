@@ -51,38 +51,45 @@ jobs:
 
             echo "Trying to fast forward $BASE_REF:"
             echo
-            git log --decorate=short -n 1 "origin/$BASE_REF" | sed 's/^/  /'
+            echo "```shell"
+            git log --decorate=short -n 1 "origin/$BASE_REF"
+            echo "```"
             echo
             echo "to $PR_REF ($PR_SHA):"
             echo
-            git log --decorate=short -n 1 "origin/$PR_REF" | sed 's/^/  /'
+            echo "```shell"
+            git log --decorate=short -n 1 "origin/$PR_REF"
+            echo "```"
             echo
 
             if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
             then
                 echo "Can't fast forward.  $BASE_REF $(git rev-parse origin/$BASE_REF) is not a direct ancestor"
-                echo "nof $PR_REF $(git rev-parse origin/$PR_REF)."
+                echo "of $PR_REF $(git rev-parse origin/$PR_REF)."
                 MERGE_BASE=$(git merge-base "origin/$BASE_REF" "origin/$PR_REF" || true)
                 if test x"$MERGE_BASE" = x
                 then
                     echo "Branches don't appear to have a common ancestor."
                 else
                     echo "Branches appear to have diverged at $MERGE_BASE:"
+                    echo "```shell"
                     git log --pretty=oneline --graph "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
                     git log --decorate=short -n 1 "$MERGE_BASE"
+                    echo "```"
                 fi
             else
+                echo "```shell"
                 set -x
                 git checkout "$BASE_REF"
                 git merge --ff-only "origin/$PR_REF"
                 git push origin
+                set +x
+                echo "```"
             fi
           } 2>&1 | tee $LOG
 
           MSG=$(mktemp)
-          jq -n --arg log "$(cat $LOG)" \
-            '{ "body": ("```shell\n" + $log + "\n```") }' \
-            >"$MSG"
+          jq -n --arg log "$(cat $LOG)" '{ "body": $log }' >"$MSG"
 
           echo Posting comment.
           curl --silent --show-error --location \
