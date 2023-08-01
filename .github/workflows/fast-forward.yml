@@ -64,8 +64,9 @@ jobs:
 
             if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
             then
-                echo "Can't fast forward.  \`$BASE_REF\` $(git rev-parse origin/$BASE_REF) is not a direct ancestor"
-                echo "of \`$PR_REF\` $(git rev-parse origin/$PR_REF)."
+                echo -n "Can't fast forward."
+                echo -n " \`$BASE_REF\` $(git rev-parse origin/$BASE_REF) is not a direct ancestor"
+                echo -n " of \`$PR_REF\` $(git rev-parse origin/$PR_REF)."
                 MERGE_BASE=$(git merge-base "origin/$BASE_REF" "origin/$PR_REF" || true)
                 if test x"$MERGE_BASE" = x
                 then
