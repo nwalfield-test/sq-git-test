@@ -60,7 +60,7 @@ jobs:
           } 2>&1 | tee $LOG
 
           MSG=$(mktemp)
-          jq -n --arg log "$(cat $LOG)" '{"body":```shell\n$log\n```}' >"$MSG"
+          jq -n --arg log "$(cat $LOG)" '{"body":"```shell\n" + $log + "\n```"}' >"$MSG"
 
           echo Posting comment.
           curl --silent --show-error --location \
