@@ -28,10 +28,9 @@ jobs:
           # echo github.event's value:; cat $GITHUB_ENV
           LOG=$(mktemp)
           {
-            echo Repository is ${{ github.repository }}
-            echo Triggered by issue ${{ github.event.issue.number }}
-            echo Triggered from ${{ github.event.issue.url }}
-            echo Triggered by ${{ github.triggering_actor }}
+            # echo Repository is ${{ github.repository }}
+            # echo Triggered by issue ${{ github.event.issue.number }}
+            echo Triggered from ${{ github.event.issue_comment.url }} by ${{ github.triggering_actor }}.
             echo
 
             EVENT=$(mktemp)
@@ -50,8 +49,11 @@ jobs:
             PR_SHA=$(jq -r '.head.sha' <$EVENT)
             PR_REF=$(jq -r '.head.ref' <$EVENT)
 
-            echo "Trying to fast forward $BASE_REF to $PR_REF ($PR_SHA)"
+            echo "Trying to fast forward $BASE_REF:"
+            echo
             git log --decorate=short -n 1 "origin/$BASE_REF" | sed 's/^/  /'
+            echo
+            echo to $PR_REF ($PR_SHA):
             echo
             git log --decorate=short -n 1 "origin/$PR_REF" | sed 's/^/  /'
             echo
