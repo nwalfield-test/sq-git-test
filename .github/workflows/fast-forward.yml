@@ -31,7 +31,7 @@ jobs:
           echo github.ref_name:  ${{ github.ref_name }}
           echo github.sha:  ${{ github.sha }}
           echo github.triggering_actor: ${{ github.triggering_actor }}
-          echo github.event.issue.pull_request: ${{ github.event.issue.pull_request }}
+          echo github.event.issue.pull_request: ${{ toJSON(github.event.issue.pull_request) }}
           echo github.event.issue.pull_request.head_ref: ${{ github.event.issue.pull_request.head_ref }}
           echo github.event.issue.pull_request.head_repository: ${{ github.event.issue.pull_request.head_repository }}
           echo github.event.issue.pull_request.head.ref: ${{ github.event.issue.pull_request.head.ref }}
