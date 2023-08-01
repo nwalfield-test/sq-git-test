@@ -1,9 +1,9 @@
 name: on-pr
 on:
-  pull_request:
-      types: [opened, edited, reopened, synchronize]
+  pull_request_target:
+      types: [opened, reopened, synchronize]
 jobs:
-  hi:
+  check-fast-forward:
     runs-on: ubuntu-latest
 
     permissions:
@@ -15,8 +15,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checking for fast forwarding
+      - name: Checking if fast forwarding is possible
         run: |
+          env
           echo "github.event's value:"; cat $GITHUB_ENV
 
           LOG=$(mktemp)
