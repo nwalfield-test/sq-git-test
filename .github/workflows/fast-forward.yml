@@ -21,6 +21,7 @@ jobs:
 
       - name: Fast Forwarding
         run: |
+          env
           echo Repository is ${{ github.repository }}
           echo Triggered by issue ${{ github.event.issue.number }}
           echo Triggered from ${{ github.event.issue.url }}
