@@ -24,26 +24,24 @@ jobs:
           echo Repository is ${{ github.repository }}
           echo Triggered by issue ${{ github.event.issue.number }}
           echo Triggered from ${{ github.event.issue.url }}
+          echo guthub.head_ref:  ${{ github.head_ref }}
+          echo guthub.ref:  ${{ github.ref }}
+          echo guthub.ref_name:  ${{ github.ref_name }}
 
-          echo "Trying to fast forward HEAD to $GITHUB_SHA"
-          echo HEAD:
-          git log -n 1 HEAD
+          echo "Trying to fast forward $GITHUB_REF to ${{ github.head_ref }}"
+          echo $GITHUB_REF:
+          git log -n 1 $GITHUB_REF
           echo
-          echo $GITHUB_SHA:
-          git log -n 1 $GITHUB_SHA
-
-          echo
-          PR_HEAD=$(git rev-parse HEAD)
-          echo $PR_HEAD:
-          git log -n 1 $PR_HEAD
+          echo ${{ github.head_ref }}:
+          git log -n 1 ${{ github.head_ref }}
 
           # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issue_comment
           #
           # - GITHUB_SHA: Last commit on default branch.
           # - GITHUB_REF: Default branch.
-          git switch -c pr-$PR_HEAD $PR_HEAD
-          git merge --ff-only $GITHUB_SHA
-          git push origin
+          #git switch -c pr-$PR_HEAD $PR_HEAD
+          #git merge --ff-only $GITHUB_SHA
+          #git push origin
 
           echo Posting comment.
           curl --silent --show-error -- location \
