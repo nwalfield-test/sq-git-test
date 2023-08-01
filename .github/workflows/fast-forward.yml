@@ -24,9 +24,12 @@ jobs:
           echo Repository is ${{ github.repository }}
           echo Triggered by issue ${{ github.event.issue.number }}
           echo Triggered from ${{ github.event.issue.url }}
-          echo guthub.head_ref:  ${{ github.head_ref }}
-          echo guthub.ref:  ${{ github.ref }}
-          echo guthub.ref_name:  ${{ github.ref_name }}
+          echo github.base_ref:  ${{ github.base_ref }}
+          echo github.head_ref:  ${{ github.head_ref }}
+          echo github.ref:  ${{ github.ref }}
+          echo github.ref_name:  ${{ github.ref_name }}
+          echo github.sha:  ${{ github.sha }}
+          echo github.triggering_actor: ${{ github.triggering_actor }}
 
           echo "Trying to fast forward $GITHUB_REF to ${{ github.head_ref }}"
           echo $GITHUB_REF:
@@ -44,7 +47,7 @@ jobs:
           #git push origin
 
           echo Posting comment.
-          curl --silent --show-error -- location \
+          curl --silent --show-error --location \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
