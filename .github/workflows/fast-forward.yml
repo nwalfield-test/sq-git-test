@@ -25,7 +25,7 @@ jobs:
           # github.event context, which is also available as
           # JSON-encoded data in the file $GITHUB_EVENT_PATH.
           #
-          # echo github.event's value:; cat $GITHUB_ENV
+          # echo "github.event's value:"; cat $GITHUB_ENV
           LOG=$(mktemp)
           {
             # echo Repository is ${{ github.repository }}
