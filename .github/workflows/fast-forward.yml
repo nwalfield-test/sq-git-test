@@ -51,10 +51,10 @@ jobs:
 
             echo "Trying to fast forward $BASE_REF to $PR_REF ($PR_SHA)"
             echo "$BASE_REF:"
-            git log -n 1 "origin/$BASE_REF"
+            git log --decorate=short -n 1 "origin/$BASE_REF"
             echo
             echo "$PR_REF:"
-            git log -n 1 "origin/$PR_REF"
+            git log --decorate=short -n 1 "origin/$PR_REF"
 
             if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
             then
@@ -64,8 +64,9 @@ jobs:
                 then
                     echo "Branches do not appear to have a common ancestor."
                 else
-                    echo "Branches appear to have diverged at $MERGE_BASE"
-                    git log -n 1 "$MERGE_BASE"
+                    echo "Branches appear to have diverged at $MERGE_BASE:"
+                    git log --decorate=short -n 1 "$MERGE_BASE"
+                    git log --pretty=oneline --graph "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
                 fi
             else
                 set -x
