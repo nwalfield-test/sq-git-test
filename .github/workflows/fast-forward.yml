@@ -63,7 +63,7 @@ jobs:
             echo
             echo "$PR_REF ($PR_SHA):"
             git log -n 1 "$PR_REF" || true
-            echo git log -n 1 "origin/$PR_REF
+            echo git log -n 1 "origin/$PR_REF"
             git log -n 1 "origin/$PR_REF" || true
 
             git checkout "$BASE_REF"
