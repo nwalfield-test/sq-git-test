@@ -41,11 +41,18 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               ${{ github.event.issue.pull_request.url }} >$EVENT
 
+            BASE_SHA=$(jq -r '.base.sha' <$EVENT)
+            BASE_REF=$(jq -r '.base.ref' <$EVENT)
+
             PR_SHA=$(jq -r '.head.sha' <$EVENT)
             PR_REF=$(jq -r '.head.ref' <$EVENT)
             PR_LABEL=$(jq -r '.head.label' <$EVENT)
-            BASE_SHA=$(jq -r '.base.sha' <$EVENT)
-            BASE_REF=$(jq -r '.base.ref' <$EVENT)
+
+            echo local branches:
+            git branch -l
+
+            echo remove branches:
+            git branch -r
 
             echo "Trying to fast forward $BASE_REF ($BASE_SHA) to $PR_REF ($PR_SHA)"
             echo "$BASE_REF ($BASE_SHA):"
