@@ -21,6 +21,13 @@ jobs:
 
       - name: Fast Forwarding
         run: |
+
+          # All of the event properties are held under the
+          # github.event context, which is also available as
+          # JSON-encoded data in the file $GITHUB_EVENT_PATH.
+          #
+          # echo github.event.; cat $GITHUB_ENV
+
           env
           echo Repository is ${{ github.repository }}
           echo Triggered by issue ${{ github.event.issue.number }}
