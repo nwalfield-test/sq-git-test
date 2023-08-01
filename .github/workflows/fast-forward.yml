@@ -47,14 +47,14 @@ jobs:
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
 
             echo "Trying to fast forward $BASE_REF ($BASE_SHA) to $PR_REF ($PR_SHA)"
-            echo $BASE_REF ($BASE_SHA):
-            git log -n 1 $BASE_REF
+            echo "$BASE_REF ($BASE_SHA):"
+            git log -n 1 "$BASE_REF"
             echo
-            echo $PR_REF ($PR_SHA):
-            git log -n 1 $PR_PR
+            echo "$PR_REF ($PR_SHA):"
+            git log -n 1 "$PR_PR"
 
-            git checkout $BASE_REF
-            git merge --ff-only $PR_REF
+            git checkout "$BASE_REF"
+            git merge --ff-only "$PR_REF"
             git push origin
           } | tee $LOG
 
