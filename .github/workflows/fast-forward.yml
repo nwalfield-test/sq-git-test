@@ -43,6 +43,7 @@ jobs:
 
             PR_SHA=$(jq -r '.head.sha' <$EVENT)
             PR_REF=$(jq -r '.head.ref' <$EVENT)
+            PR_LABEL=$(jq -r '.head.label <$EVENT)
             BASE_SHA=$(jq -r '.base.sha' <$EVENT)
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
 
@@ -51,15 +52,15 @@ jobs:
             git log -n 1 "$BASE_REF"
             echo
             echo "$PR_REF ($PR_SHA):"
-            git log -n 1 "$PR_REF"
+            git log -n 1 "$PR_LABEL"
 
             git checkout "$BASE_REF"
-            git merge --ff-only "$PR_REF"
+            git merge --ff-only "$PR_LABEL"
             git push origin
-          } | tee $LOG
+          } 2>&1 | tee $LOG
 
           MSG=$(mktemp)
-          jq -n --arg log "$(cat $LOG)" '{"body":$log}'
+          jq -n --arg log "$(cat $LOG)" '{"body":```shell\n$log\n```}' >"$MSG"
 
           echo Posting comment.
           curl --silent --show-error --location \
