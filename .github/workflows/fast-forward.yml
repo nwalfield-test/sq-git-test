@@ -41,31 +41,38 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               ${{ github.event.issue.pull_request.url }} >$EVENT
 
-            BASE_SHA=$(jq -r '.base.sha' <$EVENT)
             # This was the value of the branch at the time the PR was
             # created.
+            # BASE_SHA=$(jq -r '.base.sha' <$EVENT)
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
 
             PR_SHA=$(jq -r '.head.sha' <$EVENT)
             PR_REF=$(jq -r '.head.ref' <$EVENT)
 
-            echo local branches:
-            git branch -l
-
-            echo remove branches:
-            git branch -r
-
             echo "Trying to fast forward $BASE_REF to $PR_REF ($PR_SHA)"
-            echo "origin/$BASE_REF:"
+            echo "$BASE_REF:"
             git log -n 1 "origin/$BASE_REF"
             echo
-            echo "origin/$PR_REF:"
+            echo "$PR_REF:"
             git log -n 1 "origin/$PR_REF"
 
-            set -x
-            git checkout "$BASE_REF"
-            git merge --ff-only "origin/$PR_REF"
-            git push origin
+            if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
+            then
+                echo "Can't fast forward.  $BASE_REF $(git rev-parse origin/$BASE_REF) is not a direct ancestor of $PR_REF $(git rev-parse origin/$PR_REF)
+                MERGE_BASE=$(git merge-base "origin/$BASE_REF" "origin/$PR_REF" || true)
+                if test x"$MERGE_BASE" = x
+                then
+                    echo "Branches do not appear to have a common ancestor."
+                else
+                    echo "Branches appear to have diverged at $MERGE_BASE"
+                    git log -n 1 "$MERGE_BASE"
+                fi
+            else
+                set -x
+                git checkout "$BASE_REF"
+                git merge --ff-only "origin/$PR_REF"
+                git push origin
+            fi
           } 2>&1 | tee $LOG
 
           MSG=$(mktemp)
