@@ -51,15 +51,15 @@ jobs:
 
             echo "Trying to fast forward $BASE_REF:"
             echo
-            echo "```shell"
+            echo '```shell'
             git log --decorate=short -n 1 "origin/$BASE_REF"
-            echo "```"
+            echo '```'
             echo
             echo "to $PR_REF ($PR_SHA):"
             echo
-            echo "```shell"
+            echo '```shell'
             git log --decorate=short -n 1 "origin/$PR_REF"
-            echo "```"
+            echo '```'
             echo
 
             if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
@@ -72,19 +72,19 @@ jobs:
                     echo "Branches don't appear to have a common ancestor."
                 else
                     echo "Branches appear to have diverged at $MERGE_BASE:"
-                    echo "```shell"
+                    echo '```shell'
                     git log --pretty=oneline --graph "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
                     git log --decorate=short -n 1 "$MERGE_BASE"
-                    echo "```"
+                    echo '```'
                 fi
             else
-                echo "```shell"
+                echo '```shell'
                 set -x
                 git checkout "$BASE_REF"
                 git merge --ff-only "origin/$PR_REF"
                 git push origin
                 set +x
-                echo "```"
+                echo '```'
             fi
           } 2>&1 | tee $LOG
 
