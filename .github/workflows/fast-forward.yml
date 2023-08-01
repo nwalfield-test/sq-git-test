@@ -53,7 +53,7 @@ jobs:
             echo
             git log --decorate=short -n 1 "origin/$BASE_REF" | sed 's/^/  /'
             echo
-            echo to $PR_REF ($PR_SHA):
+            echo "to $PR_REF ($PR_SHA):"
             echo
             git log --decorate=short -n 1 "origin/$PR_REF" | sed 's/^/  /'
             echo
