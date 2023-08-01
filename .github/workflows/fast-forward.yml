@@ -21,7 +21,6 @@ jobs:
 
       - name: Fast Forwarding
         run: |
-
           # All of the event properties are held under the
           # github.event context, which is also available as
           # JSON-encoded data in the file $GITHUB_EVENT_PATH.
@@ -43,9 +42,9 @@ jobs:
               ${{ github.event.issue.pull_request.url }} >$EVENT
 
             PR_SHA=$(jq -r '.head.sha' <$EVENT)
-            PR_REF=$(jq -r '.head.ref <$EVENT)
-            BASE_SHA=$(jq -r '.base.sha <$EVENT)
-            BASE_REF=$(jq -r '.base.ref <$EVENT)
+            PR_REF=$(jq -r '.head.ref' <$EVENT)
+            BASE_SHA=$(jq -r '.base.sha' <$EVENT)
+            BASE_REF=$(jq -r '.base.ref' <$EVENT)
 
             echo "Trying to fast forward $BASE_REF ($BASE_SHA) to $PR_REF ($PR_SHA)"
             echo $BASE_REF ($BASE_SHA):
