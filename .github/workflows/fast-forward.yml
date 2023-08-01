@@ -55,19 +55,16 @@ jobs:
             echo remove branches:
             git branch -r
 
-            echo "Trying to fast forward $BASE_REF ($BASE_SHA) to $PR_REF ($PR_SHA)"
-            echo "$BASE_REF ($BASE_SHA):"
-            git log -n 1 "$BASE_REF" || true
-            echo git log -n 1 "origin/$BASE_REF"
-            git log -n 1 "origin/$BASE_REF" || true
+            echo "Trying to fast forward $BASE_REF to $PR_REF ($PR_SHA)"
+            echo "origin/$BASE_REF:"
+            git log -n 1 "origin/$BASE_REF"
             echo
-            echo "$PR_REF ($PR_SHA):"
-            git log -n 1 "$PR_REF" || true
-            echo git log -n 1 "origin/$PR_REF"
-            git log -n 1 "origin/$PR_REF" || true
+            echo "origin/$PR_REF:"
+            git log -n 1 "origin/$PR_REF"
 
+            set -x
             git checkout "$BASE_REF"
-            git merge --ff-only "$PR_REF"
+            git merge --ff-only "origin/$PR_REF"
             git push origin
           } 2>&1 | tee $LOG
 
