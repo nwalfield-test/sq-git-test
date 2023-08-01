@@ -51,7 +51,7 @@ jobs:
             git log -n 1 "$BASE_REF"
             echo
             echo "$PR_REF ($PR_SHA):"
-            git log -n 1 "$PR_REF
+            git log -n 1 "$PR_REF"
 
             git checkout "$BASE_REF"
             git merge --ff-only "$PR_REF"
