@@ -51,11 +51,9 @@ jobs:
             PR_REF=$(jq -r '.head.ref' <$EVENT)
 
             echo "Trying to fast forward $BASE_REF to $PR_REF ($PR_SHA)"
-            echo "$BASE_REF:"
-            git log --decorate=short -n 1 "origin/$BASE_REF"
+            git log --decorate=short -n 1 "origin/$BASE_REF" | sed 's/^/  /'
             echo
-            echo "$PR_REF:"
-            git log --decorate=short -n 1 "origin/$PR_REF"
+            git log --decorate=short -n 1 "origin/$PR_REF" | sed 's/^/  /'
             echo
 
             if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
