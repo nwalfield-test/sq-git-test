@@ -43,7 +43,7 @@ jobs:
 
             PR_SHA=$(jq -r '.head.sha' <$EVENT)
             PR_REF=$(jq -r '.head.ref' <$EVENT)
-            PR_LABEL=$(jq -r '.head.label <$EVENT)
+            PR_LABEL=$(jq -r '.head.label' <$EVENT)
             BASE_SHA=$(jq -r '.base.sha' <$EVENT)
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
 
