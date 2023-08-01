@@ -32,6 +32,7 @@ jobs:
             echo Triggered by issue ${{ github.event.issue.number }}
             echo Triggered from ${{ github.event.issue.url }}
             echo Triggered by ${{ github.triggering_actor }}
+            echo
 
             EVENT=$(mktemp)
             curl --silent --show-error --location \
@@ -55,18 +56,20 @@ jobs:
             echo
             echo "$PR_REF:"
             git log --decorate=short -n 1 "origin/$PR_REF"
+            echo
 
             if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
             then
-                echo "Can't fast forward.  $BASE_REF $(git rev-parse origin/$BASE_REF) is not a direct ancestor of $PR_REF $(git rev-parse origin/$PR_REF)."
+                echo "Can't fast forward.  $BASE_REF $(git rev-parse origin/$BASE_REF) is not a direct ancestor"
+                echo "nof $PR_REF $(git rev-parse origin/$PR_REF)."
                 MERGE_BASE=$(git merge-base "origin/$BASE_REF" "origin/$PR_REF" || true)
                 if test x"$MERGE_BASE" = x
                 then
-                    echo "Branches do not appear to have a common ancestor."
+                    echo "Branches don't appear to have a common ancestor."
                 else
                     echo "Branches appear to have diverged at $MERGE_BASE:"
-                    git log --decorate=short -n 1 "$MERGE_BASE"
                     git log --pretty=oneline --graph "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
+                    git log --decorate=short -n 1 "$MERGE_BASE"
                 fi
             else
                 set -x
