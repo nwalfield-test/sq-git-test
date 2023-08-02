@@ -50,11 +50,11 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              ${{ github.event.issue.pull_request.url }} >$EVENT
+              "${{ github.event.issue.pull_request.url }}" >$EVENT
 
-            echo "```json"
+            echo '```json'
             cat "$EVENT"
-            echo "```"
+            echo '```'
 
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
             # This was the value of the branch at the time the PR was
