@@ -36,6 +36,8 @@ jobs:
           #
           # env; echo "github.event's value:"; cat ${{ github.event_path }}
 
+          set -x
+
           LOG=$(mktemp)
           {
             echo "Triggered from ${{ github.event.comment.html_url }} by ${{ github.triggering_actor }}."
