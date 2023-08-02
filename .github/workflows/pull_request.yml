@@ -71,6 +71,8 @@ jobs:
                       "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
                     git log --decorate=short -n 1 "$MERGE_BASE"
                     echo '```'
+                    echo
+                    echo "Rebase locally, and then force push to \`$PR_REF\`."
                 fi
             else
                 echo -n "Add a comment with \`/fast-forward\` to fast forward"
