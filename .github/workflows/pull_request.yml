@@ -20,9 +20,7 @@ jobs:
       - name: Checking if fast forwarding is possible
         run: |
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
-
-          env
-          echo "github.event's value:"; cat $GITHUB_ENV
+          # env; echo "github.event's value:"; cat ${{ github.event_path }}
 
           LOG=$(mktemp)
           {
@@ -55,21 +53,26 @@ jobs:
             if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
             then
                 echo -n "Can't fast forward."
-                echo -n " \`$BASE_REF\` $(git rev-parse origin/$BASE_REF) is not a direct ancestor"
-                echo -n " of \`$PR_REF\` $(git rev-parse origin/$PR_REF). "
+                echo -n " \`$BASE_REF\` $(git rev-parse origin/$BASE_REF)"
+                echo -n " is not a direct ancestor of"
+                echo -n " \`$PR_REF\` $(git rev-parse origin/$PR_REF)."
+
                 MERGE_BASE=$(git merge-base "origin/$BASE_REF" "origin/$PR_REF" || true)
                 if test x"$MERGE_BASE" = x
                 then
-                    echo "Branches don't appear to have a common ancestor."
+                    echo " Branches don't appear to have a common ancestor."
                 else
-                    echo "Branches appear to have diverged at $MERGE_BASE:"
+                    echo " Branches appear to have diverged at $MERGE_BASE:"
+                    echo
                     echo '```shell'
-                    git log --pretty=oneline --graph "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
+                    git log --pretty=oneline --graph \
+                      "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
                     git log --decorate=short -n 1 "$MERGE_BASE"
                     echo '```'
                 fi
             else
-                echo "Add a comment with \`/fast-forward\` to fast forward \`$BASE_REF\` to \`PR_REF\`."
+                echo -n "Add a comment with \`/fast-forward\` to fast forward"
+                echo " \`$BASE_REF\` to \`PR_REF\`."
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
 
@@ -77,14 +80,15 @@ jobs:
           #
           # https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/
 
-          MSG=$(mktemp)
-          jq -n --arg log "$(cat $LOG)" '{ "body": $log }' >"$MSG"
+          COMMENT=$(mktemp)
+          jq -n --rawfile log "$LOG" '{ "body": $log }' >"$COMMENT"
 
-          echo Posting comment.
+          COMMENTS_URL="${{ github.event.pull_request.comments_url }}"
+          echo "Posting comment to $COMMENTS_URL."
           curl --silent --show-error --location \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            ${{ github.event.pull_request.comments_url }} \
-            -d "@$MSG"
+            "$COMMENTS_URL" \
+            -d "@$COMMENT"
