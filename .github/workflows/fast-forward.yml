@@ -95,7 +95,7 @@ jobs:
             else
                 echo '```shell'
                 (
-                  PS4='$'
+                  PS4='$ '
                   set -x
                   git push origin "$PR_SHA:$BASE_REF"
                 )
