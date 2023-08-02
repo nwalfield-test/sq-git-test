@@ -8,7 +8,6 @@ jobs:
 
     permissions:
       contents: read
-      pull-requests: write
       issues: write
 
     steps:
@@ -34,7 +33,7 @@ jobs:
 
             # echo Repository is ${{ github.repository }}
             # echo Triggered by issue ${{ github.event.issue.number }}
-            echo "Triggered from $PR_SHA by @${{ github.sender.login }}".
+            echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}".
             echo
 
             echo "Trying to fast forward \`$BASE_REF\`:"
