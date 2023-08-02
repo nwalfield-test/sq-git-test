@@ -119,7 +119,7 @@ jobs:
                     -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                     -H "X-GitHub-Api-Version: 2022-11-28" \
                     --head \
-                    "$COMMENTS_URL" \
+                    "$COLLABORATORS_URL" \
                     | awk '
                         /^HTTP/ {
                           if ($2 == "204") {
