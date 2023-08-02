@@ -50,7 +50,11 @@ jobs:
             BASE_REF=${{ github.event.pull_request.base.ref }}
 
             PR_SHA=${{ github.event.pull_request.head.sha }}
-            PR_REF=${{ github.event.pull_request.head.ref }}
+            # If the PR comes from a fork, then there is no branch
+            # named ${{ github.event.pull_request.head.ref }}, but
+            # pull/XX/merge.:
+            PR_REF=pull/${{github.event.pull_request.base.number}}/merge
+            PR_BRANCH=${{ github.event.pull_request.head.ref }}
 
             echo "Trying to fast forward \`$BASE_REF\`:"
             echo
@@ -58,21 +62,21 @@ jobs:
             git log --decorate=short -n 1 "origin/$BASE_REF"
             echo '```'
             echo
-            echo "to \`$PR_REF\` ($PR_SHA):"
+            echo "to \`$PR_BRANCH\` ($PR_SHA):"
             echo
             echo '```shell'
             git log --decorate=short -n 1 "origin/$PR_REF"
             echo '```'
             echo
 
-            if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
+            if ! git merge-base --is-ancestor "origin/$BASE_REF" "$PR_REF"
             then
                 echo -n "Can't fast forward."
                 echo -n " \`$BASE_REF\` $(git rev-parse origin/$BASE_REF)"
                 echo -n " is not a direct ancestor of"
-                echo -n " \`$PR_REF\` $(git rev-parse origin/$PR_REF)."
+                echo -n " \`$PR_REF\` $(git rev-parse $PR_REF)."
 
-                MERGE_BASE=$(git merge-base "origin/$BASE_REF" "origin/$PR_REF" || true)
+                MERGE_BASE=$(git merge-base "origin/$BASE_REF" "$PR_REF" || true)
                 if test x"$MERGE_BASE" = x
                 then
                     echo " Branches don't appear to have a common ancestor."
@@ -81,15 +85,15 @@ jobs:
                     echo
                     echo '```shell'
                     git log --pretty=oneline --graph \
-                      "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
+                      "^$MERGE_BASE^" "origin/$BASE_REF" "$PR_REF"
                     git log --decorate=short -n 1 "$MERGE_BASE"
                     echo '```'
                     echo
-                    echo "Rebase locally, and then force push to \`$PR_REF\`."
+                    echo "Rebase locally, and then force push to \`$PR_BRANCH\`."
                 fi
             else
                 echo -n "Add a comment with \`/fast-forward\` to fast forward"
-                echo " \`$BASE_REF\` to \`$PR_REF\`."
+                echo " \`$BASE_REF\` to \`$PR_BRANCH\`."
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
 
