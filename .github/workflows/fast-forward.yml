@@ -120,6 +120,7 @@ jobs:
                     -H "X-GitHub-Api-Version: 2022-11-28" \
                     --head \
                     "$COLLABORATORS_URL" \
+                    | tee /dev/stderr \
                     | awk '
                         /^HTTP/ {
                           if ($2 == "204") {
@@ -140,7 +141,7 @@ jobs:
                   )
                   echo '```'
                 else
-                  echo "Only those with write access to this repository can merge pull requests."
+                  echo "Sorry ${{ github.event.sender.login }}, only those with write access to this repository can merge pull requests."
                 fi
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
