@@ -51,11 +51,11 @@ jobs:
             BASE_REF=${{ github.event.pull_request.base.ref }}
 
             PR_SHA=${{ github.event.pull_request.head.sha }}
+            PR_REF=${{ github.event.pull_request.head.ref }}
             # If the PR comes from a fork, then there is no branch
-            # named ${{ github.event.pull_request.head.ref }}, but
-            # pull/XX/merge.:
-            PR_REF="pull/${{ github.event.pull_request.number }}/merge"
-            PR_BRANCH=${{ github.event.pull_request.head.ref }}
+            # (either local or in origin) named ${{
+            # github.event.pull_request.head.ref }}.
+            git branch -f "$PR_REF" "$PR_SHA"
 
             echo "Trying to fast forward \`$BASE_REF\`:"
             echo
