@@ -110,7 +110,7 @@ jobs:
                 fi
             else
                 # https://docs.github.com/en/rest/collaborators/collaborators?apiVersion=2022-11-28#check-if-a-user-is-a-repository-collaborator
-                COLLABORATORS_URL="$(jq -r '.base.repo.collaborators_url')"
+                COLLABORATORS_URL="$(jq -r '.head.base.repo.collaborators_url')"
                 echo "COLLABORATORS_URL: $COLLABORATORS_URL"
                 COLLABORATORS_URL="${COLLABORATORS_URL%\{/collaborator\}}/${{ github.event.sender.login }}"
                 echo "COLLABORATORS_URL 2: $COLLABORATORS_URL"
