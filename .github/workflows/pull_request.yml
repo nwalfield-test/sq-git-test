@@ -8,8 +8,8 @@ jobs:
 
     permissions:
       contents: read
+      pull-requests: write
       issues: write
-      pull_requests: write
 
     steps:
       - name: Checkout
