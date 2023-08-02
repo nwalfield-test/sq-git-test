@@ -53,7 +53,7 @@ jobs:
             # github.event.pull_request.head.ref.
             git branch -f "pull_request/$PR_REF" "$PR_SHA"
 
-            echo "Trying to fast forward \`$BASE_REF\` ($BASE_SHA):"
+            echo "Checking if we can fast forward \`$BASE_REF\` ($BASE_SHA):"
             echo
             echo '```shell'
             git log --decorate=short -n 1 "$BASE_SHA"

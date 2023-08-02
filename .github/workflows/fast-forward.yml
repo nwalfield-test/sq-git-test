@@ -34,9 +34,8 @@ jobs:
           #
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
           #
-          # env; echo "github.event's value:"; cat ${{ github.event_path }}
-
-          set -x
+          # env; echo "github.event's value:";
+          cat ${{ github.event_path }}
 
           LOG=$(mktemp)
           {
@@ -51,6 +50,8 @@ jobs:
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               "${{ github.event.issue.pull_request.url }}" >$EVENT
+
+            cat $EVENT
 
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
             # This was the value of the branch at the time the PR was
