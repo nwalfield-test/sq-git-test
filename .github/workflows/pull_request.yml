@@ -68,7 +68,7 @@ jobs:
             echo "to \`$PR_REF\` ($PR_SHA):"
             echo
             echo '```shell'
-            git log --decorate=short -n 1 "$PR_SHA
+            git log --decorate=short -n 1 "$PR_SHA"
             echo '```'
             echo
 
