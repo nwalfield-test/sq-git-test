@@ -1,4 +1,4 @@
-name: on-pr
+name: pull-request
 on:
   pull_request_target:
       types: [opened, reopened, synchronize]
@@ -21,11 +21,23 @@ jobs:
 
       - name: Checking if fast forwarding is possible
         run: |
+          # All of the event properties are held under the
+          # github.event context, which is also available as
+          # JSON-encoded data in the file $GITHUB_EVENT_PATH.
+          #
+          # For a pull_request event:
+          #
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+          #
           # env; echo "github.event's value:"; cat ${{ github.event_path }}
 
           LOG=$(mktemp)
           {
+            # echo Repository is ${{ github.repository }}
+            # echo Triggered by issue ${{ github.event.issue.number }}
+            echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}".
+            echo
+
             # This was the value of the branch at the time the PR was
             # created.
             # BASE_SHA=$(jq -r '.base.sha' <$EVENT)
@@ -33,11 +45,6 @@ jobs:
 
             PR_SHA=${{ github.event.pull_request.head.sha }}
             PR_REF=${{ github.event.pull_request.head.ref }}
-
-            # echo Repository is ${{ github.repository }}
-            # echo Triggered by issue ${{ github.event.issue.number }}
-            echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}".
-            echo
 
             echo "Trying to fast forward \`$BASE_REF\`:"
             echo
@@ -76,7 +83,7 @@ jobs:
                 fi
             else
                 echo -n "Add a comment with \`/fast-forward\` to fast forward"
-                echo " \`$BASE_REF\` to \`PR_REF\`."
+                echo " \`$BASE_REF\` to \`$PR_REF\`."
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
 
