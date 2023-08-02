@@ -31,7 +31,8 @@ jobs:
           #
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
           #
-          # env; echo "github.event's value:"; cat ${{ github.event_path }}
+          # env; echo "github.event's value:";
+          cat ${{ github.event_path }}
 
           LOG=$(mktemp)
           {

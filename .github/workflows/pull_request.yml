@@ -29,7 +29,8 @@ jobs:
           #
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
           #
-          # env; echo "github.event's value:"; cat ${{ github.event_path }}
+          # env; echo "github.event's value:";
+          cat ${{ github.event_path }}
 
           LOG=$(mktemp)
           {
@@ -53,7 +54,7 @@ jobs:
             # If the PR comes from a fork, then there is no branch
             # named ${{ github.event.pull_request.head.ref }}, but
             # pull/XX/merge.:
-            PR_REF=pull/${{github.event.pull_request.base.number}}/merge
+            PR_REF="pull/${{ github.event.pull_request.number }}/merge"
             PR_BRANCH=${{ github.event.pull_request.head.ref }}
 
             echo "Trying to fast forward \`$BASE_REF\`:"
@@ -65,7 +66,7 @@ jobs:
             echo "to \`$PR_BRANCH\` ($PR_SHA):"
             echo
             echo '```shell'
-            git log --decorate=short -n 1 "origin/$PR_REF"
+            git log --decorate=short -n 1 "$PR_REF"
             echo '```'
             echo
 
