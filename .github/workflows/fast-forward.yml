@@ -87,11 +87,10 @@ jobs:
             else
                 echo '```shell'
                 (
+                  git config advice.detachedHead false
                   set -x
-                  git checkout "origin/$BASE_REF"
-                  git merge --ff-only "origin/$PR_REF"
-                  git push origin
-                ) | sed 's/^+ /$ /'
+                  git push origin "$PR_SHA:$BASE_REF"
+                ) | sed 's/^[+] /$ /'
                 echo '```'
             fi
           } 2>&1 | tee $LOG
