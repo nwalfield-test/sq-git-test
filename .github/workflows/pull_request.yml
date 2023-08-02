@@ -21,6 +21,9 @@ jobs:
 
       - name: Checking if fast forwarding is possible
         run: |
+          # Repository is ${{ github.repository }}
+          # Triggered by issue ${{ github.event.issue.number }}
+
           # All of the event properties are held under the
           # github.event context, which is also available as
           # JSON-encoded data in the file $GITHUB_EVENT_PATH.
@@ -29,27 +32,26 @@ jobs:
           #
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
           #
-          # env; echo "github.event's value:";
-          cat ${{ github.event_path }}
+          # env; echo "github.event's value:"; cat ${{ github.event_path }}
 
           LOG=$(mktemp)
           {
-            # echo Repository is ${{ github.repository }}
-            # echo Triggered by issue ${{ github.event.issue.number }}
-            echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}."
-            echo
-
-            # This was the value of the branch at the time the PR was
-            # created.
-            # BASE_SHA=$(jq -r '.base.sha' <$EVENT)
             BASE_REF="${{ github.event.pull_request.base.ref }}"
+            # github.event.pull_request.base.sha is the commit of the
+            # branch at the time the PR was created and not
+            # necessarily the current commit.
+            BASE_SHA="$(git rev-parse origin/$BASE_REF)"
 
             PR_SHA=${{ github.event.pull_request.head.sha }}
             PR_REF=${{ github.event.pull_request.head.ref }}
+
+            echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}."
+            echo
+
             # If the PR comes from a fork, then there is no branch
             # (either local or in origin) named
             # github.event.pull_request.head.ref.
-            git branch -f "$PR_REF" "$PR_SHA"
+            git branch -f "pull_request/$PR_REF" "$PR_SHA"
 
             (
               set -x
@@ -57,27 +59,27 @@ jobs:
               git branch -r
             )
 
-            echo "Trying to fast forward \`$BASE_REF\`:"
+            echo "Trying to fast forward \`$BASE_REF\` ($BASE_SHA):"
             echo
             echo '```shell'
-            git log --decorate=short -n 1 "origin/$BASE_REF"
+            git log --decorate=short -n 1 "$BASE_SHA"
             echo '```'
             echo
-            echo "to \`$PR_BRANCH\` ($PR_SHA):"
+            echo "to \`$PR_REF\` ($PR_SHA):"
             echo
             echo '```shell'
-            git log --decorate=short -n 1 "$PR_REF"
+            git log --decorate=short -n 1 "$PR_SHA
             echo '```'
             echo
 
-            if ! git merge-base --is-ancestor "origin/$BASE_REF" "$PR_REF"
+            if ! git merge-base --is-ancestor "$BASE_SHA "$PR_SHA
             then
                 echo -n "Can't fast forward."
-                echo -n " \`$BASE_REF\` $(git rev-parse origin/$BASE_REF)"
+                echo -n " \`$BASE_REF\` $BASE_SHA"
                 echo -n " is not a direct ancestor of"
-                echo -n " \`$PR_REF\` $(git rev-parse $PR_REF)."
+                echo -n " \`$PR_REF\` $PR_SHA."
 
-                MERGE_BASE=$(git merge-base "origin/$BASE_REF" "$PR_REF" || true)
+                MERGE_BASE=$(git merge-base "$BASE_SHA" "$PR_SHA" || true)
                 if test x"$MERGE_BASE" = x
                 then
                     echo " Branches don't appear to have a common ancestor."
@@ -86,15 +88,15 @@ jobs:
                     echo
                     echo '```shell'
                     git log --pretty=oneline --graph \
-                      "^$MERGE_BASE^" "origin/$BASE_REF" "$PR_REF"
+                      "^$MERGE_BASE^" "$BASE_SHA" "$PR_SHA"
                     git log --decorate=short -n 1 "$MERGE_BASE"
                     echo '```'
                     echo
-                    echo "Rebase locally, and then force push to \`$PR_BRANCH\`."
+                    echo "Rebase locally, and then force push to \`$PR_REF\`."
                 fi
             else
                 echo -n "Add a comment with \`/fast-forward\` to fast forward"
-                echo " \`$BASE_REF\` to \`$PR_BRANCH\`."
+                echo " \`$BASE_REF\` to \`$PR_REF\`."
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
 
