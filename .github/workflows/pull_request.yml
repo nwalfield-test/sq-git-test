@@ -22,7 +22,7 @@ jobs:
       - name: Checking if fast forwarding is possible
         run: |
           # Repository is ${{ github.repository }}
-          # Triggered by issue ${{ github.event.issue.number }}
+          # Triggered by issue ${{ github.event.pull_request.base.number }}
 
           # All of the event properties are held under the
           # github.event context, which is also available as
@@ -42,8 +42,8 @@ jobs:
             # necessarily the current commit.
             BASE_SHA="$(git rev-parse origin/$BASE_REF)"
 
-            PR_SHA=${{ github.event.pull_request.head.sha }}
             PR_REF=${{ github.event.pull_request.head.ref }}
+            PR_SHA=${{ github.event.pull_request.head.sha }}
 
             echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}."
             echo
@@ -52,12 +52,6 @@ jobs:
             # (either local or in origin) named
             # github.event.pull_request.head.ref.
             git branch -f "pull_request/$PR_REF" "$PR_SHA"
-
-            (
-              set -x
-              git branch -l
-              git branch -r
-            )
 
             echo "Trying to fast forward \`$BASE_REF\` ($BASE_SHA):"
             echo

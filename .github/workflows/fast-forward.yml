@@ -23,6 +23,9 @@ jobs:
 
       - name: Fast Forwarding
         run: |
+          # Repository is ${{ github.repository }}
+          # Triggered by issue ${{ github.event.issue.number }}
+
           # All of the event properties are held under the
           # github.event context, which is also available as
           # JSON-encoded data in the file $GITHUB_EVENT_PATH.
@@ -31,13 +34,10 @@ jobs:
           #
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
           #
-          # env; echo "github.event's value:";
-          cat ${{ github.event_path }}
+          # env; echo "github.event's value:"; cat ${{ github.event_path }}
 
           LOG=$(mktemp)
           {
-            # echo Repository is ${{ github.repository }}
-            # echo Triggered by issue ${{ github.event.issue.number }}
             echo "Triggered from ${{ github.event.comment.html_url }} by ${{ github.triggering_actor }}."
             echo
 
@@ -50,35 +50,41 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               ${{ github.event.issue.pull_request.url }} >$EVENT
 
+            BASE_REF=$(jq -r '.base.ref' <$EVENT)
             # This was the value of the branch at the time the PR was
             # created.
             # BASE_SHA=$(jq -r '.base.sha' <$EVENT)
-            BASE_REF=$(jq -r '.base.ref' <$EVENT)
+            BASE_SHA="$(git rev-parse origin/$BASE_REF)"
 
-            PR_SHA=$(jq -r '.head.sha' <$EVENT)
             PR_REF=$(jq -r '.head.ref' <$EVENT)
+            PR_SHA=$(jq -r '.head.sha' <$EVENT)
 
-            echo "Trying to fast forward \`$BASE_REF\`:"
+            # If the PR comes from a fork, then there is no branch
+            # (either local or in origin) named
+            # github.event.pull_request.head.ref.
+            git branch -f "pull_request/$PR_REF" "$PR_SHA"
+
+            echo "Trying to fast forward \`$BASE_REF\` ($BASE_SHA):"
             echo
             echo '```shell'
-            git log --decorate=short -n 1 "origin/$BASE_REF"
+            git log --decorate=short -n 1 "$BASE_SHA"
             echo '```'
             echo
             echo "to \`$PR_REF\` ($PR_SHA):"
             echo
             echo '```shell'
-            git log --decorate=short -n 1 "origin/$PR_REF"
+            git log --decorate=short -n 1 "$PR_SHA"
             echo '```'
             echo
 
-            if ! git merge-base --is-ancestor "origin/$BASE_REF" "origin/$PR_REF"
+            if ! git merge-base --is-ancestor "$BASE_SHA" "$PR_SHA"
             then
                 echo -n "Can't fast forward."
-                echo -n " \`$BASE_REF\` $(git rev-parse origin/$BASE_REF)"
+                echo -n " \`$BASE_REF\` $BASE_SHA"
                 echo -n " is not a direct ancestor of"
-                echo -n " \`$PR_REF\` $(git rev-parse origin/$PR_REF)."
+                echo -n " \`$PR_REF\` $PR_SHA."
 
-                MERGE_BASE=$(git merge-base "origin/$BASE_REF" "origin/$PR_REF" || true)
+                MERGE_BASE=$(git merge-base "$BASE_SHA" "$PR_SHA" || true)
                 if test x"$MERGE_BASE" = x
                 then
                     echo " Branches don't appear to have a common ancestor."
@@ -87,7 +93,7 @@ jobs:
                     echo
                     echo '```shell'
                     git log --pretty=oneline --graph \
-                      "^$MERGE_BASE^" "origin/$BASE_REF" "origin/$PR_REF"
+                      "^$MERGE_BASE^" "$BASE_SHA" "$PR_SHA"
                     git log --decorate=short -n 1 "$MERGE_BASE"
                     echo '```'
                     echo
@@ -122,8 +128,7 @@ jobs:
                   )
                   echo '```'
                 else
-                  echo "Please be patient. A project maintainer will"
-                  echo " look at your pull request."
+                  echo "Only those with write access to this repository can merge pull requests."
                 fi
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
