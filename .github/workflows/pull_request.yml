@@ -38,6 +38,12 @@ jobs:
             echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}".
             echo
 
+            (
+              set -x
+              git branch -l
+              git branch -r
+            )
+
             # This was the value of the branch at the time the PR was
             # created.
             # BASE_SHA=$(jq -r '.base.sha' <$EVENT)
