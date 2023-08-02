@@ -93,13 +93,37 @@ jobs:
                     echo "Rebase locally, and then force push to \`$PR_REF\`."
                 fi
             else
-                echo '```shell'
-                (
-                  PS4='$ '
-                  set -x
-                  git push origin "$PR_SHA:$BASE_REF"
-                )
-                echo '```'
+                # https://docs.github.com/en/rest/collaborators/collaborators?apiVersion=2022-11-28#check-if-a-user-is-a-repository-collaborator
+                COLLABORATORS_URL="${{ github.repository.collaborators_url }}"
+                echo "COLLABORATORS_URL: $COLLABORATORS_URL"
+                COLLABORATORS_URL="${COLLABORATORS_URL%\{/collaborator\}}/${{ github.event.sender.login }}"
+                echo "COLLABORATORS_URL 2: $COLLABORATORS_URL"
+                if curl --silent --show-error --location \
+                    -H "Accept: application/vnd.github+json" \
+                    -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "X-GitHub-Api-Version: 2022-11-28" \
+                    --head \
+                    "$COMMENTS_URL"
+                    | awk '/^HTTP/ { \
+                        if ($2 == "204") {
+                          exit 0;
+                        } else {
+                          print "Access denied: "$2;
+                          exit 1;
+                        }
+                      }'
+                then
+                  echo '```shell'
+                  (
+                    PS4='$ '
+                    set -x
+                    git push origin "$PR_SHA:$BASE_REF"
+                  )
+                  echo '```'
+                else
+                  echo "Please be patient. A project maintainer will"
+                  echo " look at your pull request."
+                fi
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
 
