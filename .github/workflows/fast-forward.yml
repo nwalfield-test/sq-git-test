@@ -131,7 +131,7 @@ jobs:
                           }
                         }
 
-                        END { exit 1; }'
+                        // { exit 1; }'
                 then
                   echo '```shell'
                   (
@@ -141,7 +141,7 @@ jobs:
                   )
                   echo '```'
                 else
-                  echo "Sorry ${{ github.event.sender.login }}, only those with write access to this repository can merge pull requests."
+                  echo "Sorry @${{ github.event.sender.login }}, only those with write access to this repository can merge pull requests."
                 fi
             fi
           } 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" "$LOG"
