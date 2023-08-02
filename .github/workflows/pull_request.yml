@@ -36,7 +36,7 @@ jobs:
           {
             # echo Repository is ${{ github.repository }}
             # echo Triggered by issue ${{ github.event.issue.number }}
-            echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}".
+            echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}."
             echo
 
             (
@@ -48,13 +48,13 @@ jobs:
             # This was the value of the branch at the time the PR was
             # created.
             # BASE_SHA=$(jq -r '.base.sha' <$EVENT)
-            BASE_REF=${{ github.event.pull_request.base.ref }}
+            BASE_REF="${{ github.event.pull_request.base.ref }}"
 
             PR_SHA=${{ github.event.pull_request.head.sha }}
             PR_REF=${{ github.event.pull_request.head.ref }}
             # If the PR comes from a fork, then there is no branch
-            # (either local or in origin) named ${{
-            # github.event.pull_request.head.ref }}.
+            # (either local or in origin) named
+            # github.event.pull_request.head.ref.
             git branch -f "$PR_REF" "$PR_SHA"
 
             echo "Trying to fast forward \`$BASE_REF\`:"
