@@ -72,7 +72,7 @@ jobs:
             echo '```'
             echo
 
-            if ! git merge-base --is-ancestor "$BASE_SHA "$PR_SHA"
+            if ! git merge-base --is-ancestor "$BASE_SHA" "$PR_SHA"
             then
                 echo -n "Can't fast forward."
                 echo -n " \`$BASE_REF\` $BASE_SHA"
