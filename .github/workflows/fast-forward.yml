@@ -52,6 +52,10 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               ${{ github.event.issue.pull_request.url }} >$EVENT
 
+            echo "```json"
+            cat "$EVENT"
+            echo "```"
+
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
             # This was the value of the branch at the time the PR was
             # created.
