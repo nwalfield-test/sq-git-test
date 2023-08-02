@@ -52,16 +52,6 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               "${{ github.event.issue.pull_request.url }}" >$EVENT
 
-            # Our git repository only has the content from the main
-            # repository.  If this is a foreign repository, then we
-            # need fetch its contents too.  (If not, this is a no op.)
-            CLONE_URL=$(jq -r '.head.repo.clone_url' <$EVENT)
-            git fetch "$CLONE_URL"
-
-            echo '```json'
-            cat "$EVENT"
-            echo '```'
-
             BASE_REF=$(jq -r '.base.ref' <$EVENT)
             # This was the value of the branch at the time the PR was
             # created.
@@ -70,6 +60,12 @@ jobs:
 
             PR_REF=$(jq -r '.head.ref' <$EVENT)
             PR_SHA=$(jq -r '.head.sha' <$EVENT)
+
+            # Our git repository only has the content from the main
+            # repository.  If this is a foreign repository, then we
+            # need fetch its contents too.  (If not, this is a no op.)
+            CLONE_URL=$(jq -r '.head.repo.clone_url' <$EVENT)
+            git fetch "$CLONE_URL" "$PR_SHA"
 
             # If the PR comes from a fork, then there is no branch
             # (either local or in origin) named
