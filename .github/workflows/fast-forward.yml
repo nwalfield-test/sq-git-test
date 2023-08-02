@@ -11,7 +11,7 @@ jobs:
       pull-requests: write
       issues: write
 
-    if: ${{ github.event.issue.pull_request && github.event.issue.pull_request.state == "open" && contains(github.event.comment.body, '/fast-forward') }}
+    if: ${{ github.event.issue.pull_request && github.event.issue.pull_request.state == 'open' && contains(github.event.comment.body, '/fast-forward') }}
 
     steps:
       - name: Checkout
