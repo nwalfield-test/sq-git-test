@@ -11,7 +11,9 @@ jobs:
       pull-requests: write
       issues: write
 
-    if: ${{ github.event.issue.pull_request && github.event.issue.pull_request.state == 'open' && contains(github.event.comment.body, '/fast-forward') }}
+    if: ${{ github.event.issue.pull_request
+            && github.event.issue.state == 'open'
+            && contains(github.event.comment.body, '/fast-forward') }}
 
     steps:
       - name: Checkout
@@ -25,11 +27,11 @@ jobs:
           # github.event context, which is also available as
           # JSON-encoded data in the file $GITHUB_EVENT_PATH.
           #
-          # echo "github.event's value:"; cat $GITHUB_ENV
-          #
           # For an issue_comment event:
           #
           # https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
+          # env; echo "github.event's value:"; cat ${{ github.event_path }}
+
           LOG=$(mktemp)
           {
             # echo Repository is ${{ github.repository }}
