@@ -49,6 +49,12 @@ jobs:
             echo "Triggered from $PR_SHA by @${{ github.event.sender.login }}."
             echo
 
+            # Our git repository only has the content from the main
+            # repository.  If this is a foreign repository, then we
+            # need fetch its contents too.  (If not, this is a no op.)
+            CLONE_URL=${{ github.event.pull_request.head.repo.clone_url }}
+            git fetch --quiet "$CLONE_URL" "$PR_SHA"
+
             # If the PR comes from a fork, then there is no branch
             # (either local or in origin) named
             # github.event.pull_request.head.ref.
