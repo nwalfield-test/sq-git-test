@@ -38,7 +38,7 @@ jobs:
 
           LOG=$(mktemp)
           {
-            echo "Triggered from ${{ github.event.comment.html_url }} by ${{ github.triggering_actor }}."
+            echo "Triggered from ${{ github.event.comment.html_url }} by @${{ github.triggering_actor }}."
             echo
 
             # Get the PR metadata.
