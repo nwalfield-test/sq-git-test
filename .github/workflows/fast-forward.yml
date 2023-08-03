@@ -64,7 +64,7 @@ jobs:
             # repository.  If this is a foreign repository, then we
             # need fetch its contents too.  (If not, this is a no op.)
             CLONE_URL=$(jq -r '.head.repo.clone_url' <$EVENT)
-            git fetch "$CLONE_URL" "$PR_SHA"
+            git fetch --quiet "$CLONE_URL" "$PR_SHA"
 
             # If the PR comes from a fork, then there is no branch
             # (either local or in origin) named
